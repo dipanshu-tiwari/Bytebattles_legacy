@@ -1,0 +1,103 @@
+{% extends 'layout_profile.html' %}
+ 
+{% block prof_title %}
+Statistics
+{% endblock %}
+
+{% block prof_content %}
+
+<div class="p-6 bg-gray-200 rounded-2xl">
+    <h2 class="text-2xl font-semibold text-center">Solved Problems</h2>
+
+    <table class="table-auto w-full border-separate border-spacing-y-1 mt-8">
+        <tr>
+            <th class="text-lg">Problem ID</th>
+            <th class="text-lg">Title</th>
+            <th class="text-lg">categories</th>
+            <th class="text-lg">Rating</th>
+            <th class="text-lg">AC Rate</th>
+            <th class="text-lg">Submit</th> 
+        </tr>
+        <tr>
+            <td class="pt-5"></td>
+        </tr>
+        {% for problem in solved %}
+            <tr class="odd:bg-white">
+                <td class="text-center py-4 px-3"><a href="{% url 'details' problem.pid %}">{{problem.pid}}</a></td>
+                <td class="text-center py-4 px-3"><a href="{% url 'details' problem.pid %}">{{problem.name}}</a></td>
+                <td class="text-center py-4 px-6">
+                    <div class="flex gap-1 justify-center flex-wrap">
+                        {% for cat in problem.categories.all %}
+                            <a class="px-2 bg-gray-500 text-white rounded-md" href="?categories=[&quot;{{cat.slug}}&quot;]">{{cat.name}}</a>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td class="text-center py-4 px-3">{{problem.rating}}</td>
+                <td class="text-center py-4 px-3">{{problem.acr}}</td>
+                <td class="rounded-r-2xl text-center py-4 px-3"><a href="{% url 'submitpid' problem.pid %}" class="font-semibold px-2 py-1 bg-brand text-white rounded-xl hover:bg-brand-hov transition">Submit</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div class="px-6 py-3 flex justify-between mt-6 items-center">
+        <div class="space-x-3">
+            {% if solved.has_previous %}
+                <button class="px-6 py-3 text-lg font-semibold bg-brand-dark rounded-xl text-white hover:bg-brand-dhov" onclick="pageFirst()">&laquo;</button>
+                <button class="px-6 py-3 text-lg font-semibold bg-brand-dark rounded-xl text-white hover:bg-brand-dhov" onclick="pageDown()">Previous</button>
+            {% else %}
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">&laquo;</button>
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">Previous</button>
+            {% endif %}
+        </div>
+
+        <h3>Page {{solved.number}} - {{solved.paginator.num_pages}}</h3>
+        
+        <div class="space-x-3">
+            {% if solved.has_next %}
+                <button class="px-6 py-3 text-lg font-semibold bg-brand rounded-xl text-white hover:bg-brand-hov" onclick="pageUp()">Next</button>
+                <button class="px-6 py-3 text-lg font-semibold bg-brand rounded-xl text-white hover:bg-brand-hov" onclick="pageLast()">&raquo;</button>
+            {% else %}
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">Next</button>
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">&raquo;</button>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    function pageUp() {
+        {% if solved.has_next %}
+            const url = new URL(window.location);
+            const params = url.searchParams;
+            params.set('page', '{{ solved.next_page_number }}');
+            window.location.href = url.toString();
+        {% endif %}
+    }
+
+    function pageDown() {
+        {% if solved.has_previous %}
+            const url = new URL(window.location);
+            const params = url.searchParams;
+            params.set('page', '{{ solved.previous_page_number }}');
+            window.location.href = url.toString();
+        {% endif %}
+    }
+
+    function pageFirst() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        params.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    function pageLast() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        params.set('page', '{{solved.paginator.num_pages}}');
+        window.location.href = url.toString();
+    }
+</script>
+
+{% endblock %}

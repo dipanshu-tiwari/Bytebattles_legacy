@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{problem.name}}
+{% endblock %}
+
+{% block head %}
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-4 m-6 gap-x-6">
+    <div class="p-6 bg-gray-200 rounded-2xl col-span-3">
+        <div class="my-6">
+            {% if problem.isCSES %}
+                <h2 class="text-2xl font-bold text-center mb-2">{{problem.name}} ({{problem.pid}}) - <a href="{{ problem.source }}">CSES</a></h2>
+            {% elif problem.level %}
+                <h2 class="text-2xl font-bold text-center mb-2">{{problem.level}}. {{problem.name}} ({{problem.pid}})</h2>
+            {% else %}
+                <h2 class="test-2xl font-bold text-center mb-2">{{problem.name}}</h2>
+            {% endif %}
+
+            <p class="text-md text-center text-gray-800">Time Limit: {{problem.time_limit}} second</p>
+            <p class="text-md text-center text-gray-800">Memory Limit: {{problem.memory_limit}} MB</p>
+        </div>
+
+        <div class="my-4">
+            <h3 class="text-xl font-semibold">Statement</h3>
+            <p class="whitespace-pre-wrap">{{problem.statement}}</p>
+        </div>
+
+        <div class="my-4">
+            <h3 class="text-xl font-semibold">Input</h3>
+            <p class="whitespace-pre-wrap">{{problem.input}}</p>
+        </div>
+
+        <div class="my-4">
+            <h3 class="text-xl font-semibold">Output</h3>
+            <p class="whitespace-pre-wrap">{{problem.output}}</p>
+        </div>
+
+        <div class="my-4">
+            <h3 class="text-xl font-semibold">Constraints</h3>
+            <ul class="list-disc pl-5 mt-1">
+            {% for const in problem.constraints %}
+                <li>{{const}}</li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        {% for io in problem.sample_io %}
+            {% if problem.sample_io|length == 1 %}
+            <h3 class="text-xl font-semibold my-3">Example</h3>
+            {% else %}
+            <h3 class="text-xl font-semibold my-3">Example {{forloop.counter}}</h3>
+            {% endif %}
+
+            <div class="my-4">
+                <h3 class="text-lg my-2">Sample Input: <a class="px-2 py-1 bg-brand text-white rounded-lg hover:bg-brand-hov transition" onclick="copyToClipboard('input')" id="input-btn">Copy</a></h3>
+                <div class="flex">
+                    <pre class="px-4 py-2 bg-white rounded-xl" id="input">{{io.input}}</pre>
+                </div>
+
+                <h3 class="text-lg my-2">Sample Output: <a class="px-2 py-1 bg-brand text-white rounded-lg hover:bg-brand-hov transition" onclick="copyToClipboard('output')" id="output-btn">Copy</a></h3>
+                <div class="flex">
+                    <pre class="px-4 py-2 bg-white rounded-xl" id="output">{{io.output}}</pre>
+                </div>
+            </div>
+        {% endfor %}
+
+
+        {% if problem.note %}
+            <div class="my-4">
+                <h3 class="text-xl font-semibold">Note</h3>
+                <p>{{problem.note}}</p>
+            </div>
+        {% endif %}
+
+        {% if problem.isCSES %}
+        <br>
+        <p class="text-md text-gray-600 italic">"This problem is from <a href="https://cses.fi/problemset/" class="text-blue-500">CSES Problem Set</a>. Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="text-blue-500">CC BY-NC-SA 4.0</a>."</p>
+        {% endif %}
+    </div>
+    <div class="p-6 bg-gray-200 rounded-2xl col-span-1">
+        <div class="flex justify-center items-center border-b border-gray-400 pt-6 pb-12">
+            <a href="{% url 'submitpid' problem.pid %}" class="text-lg font-semibold px-6 py-3 text-center bg-brand text-white rounded-xl hover:bg-brand-hov transition">Submit</a>
+        </div>
+
+        <div class="py-12 border-b border-gray-400">
+            <table class="table-auto w-full">
+                <tr>
+                    <td>Acceptance Rate: </td>
+                    <td class="text-center">{{problem.acr}}</td>
+                </tr>
+                <tr>
+                    <td>Accepted Submissions: </td>
+                    <td class="text-center">{{problem.accepted_submissions}}</td>
+                </tr>
+                <tr>
+                    <td>Total Submissions: </td>
+                    <td class="text-center">{{problem.total_submissions}}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="py-12 border-b border-gray-400 space-y-3">
+            <h3 class="text-lg font-semibold text-center">Categories</h3>
+            <div class="flex gap-1 items-center flex-wrap">
+                {% for cat in problem.categories.all %}
+                    <a class="px-2 bg-gray-500 text-white rounded-md" href="{% url 'problems' %}?categories=[&quot;{{cat.slug}}&quot;]">{{cat.name}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+<script>
+function copyToClipboard(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(function() {
+        document.getElementById(id + "-btn").innerText = "Copied!"
+    }, function(err) {
+        document.getElementById(id + "-btn").innerText = "Failed!"
+    });
+}
+</script>
+{% endblock %}

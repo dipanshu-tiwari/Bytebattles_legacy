@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Problems
+{% endblock %}
+
+{% block content %}
+
+<div class="m-6 grid grid-cols-5 gap-x-6">
+    <div class="p-6 bg-gray-200 rounded-2xl col-span-4">
+        <h2 class="text-2xl font-semibold text-center">Problems</h2>
+
+        <table class="table-auto w-full border-separate border-spacing-y-1 mt-8">
+            <tr>
+                <th class="text-lg">Problem ID</th>
+                <th class="text-lg">Title</th>
+                <th class="text-lg">categories</th>
+                <th class="text-lg">Rating <a onclick="ratingSort()">&#8691;</a></th>
+                <th class="text-lg">AC Rate <a onclick="acrSort()">&#8691;</a></th>
+                <th class="text-lg">Details</th> 
+                <th class="text-lg">Submit</th> 
+            </tr>
+            <tr>
+                <td class="pt-5"></td>
+            </tr>
+            {% for problem in problems %}
+            <tr class="odd:bg-white">
+                <td class="text-center py-4 px-3"><a href="{% url 'details' problem.pid %}">{{problem.pid}}</a></td>
+                <td class="text-center py-4 px-3"><a href="{% url 'details' problem.pid %}">{{problem.name}}</a></td>
+                <td class="text-center py-4 px-6">
+                    <div class="flex gap-1 justify-center flex-wrap">
+                        {% for cat in problem.categories.all %}
+                            <a class="px-2 bg-gray-500 text-white rounded-md" href="?categories=[&quot;{{cat.slug}}&quot;]">{{cat.name}}</a>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td class="text-center py-4 px-3">{{problem.rating}}</td>
+                <td class="text-center py-4 px-3">{{problem.acr}}</td>
+                <td class="text-center py-4 px-3"><a href="{% url 'details' problem.pid %}" class="font-semibold px-2 py-1 bg-brand-dark text-white rounded-xl hover:bg-brand-dhov transition">Details</a></td>
+                <td class="rounded-r-2xl text-center py-4 px-3"><a href="{% url 'submitpid' problem.pid %}" class="font-semibold px-2 py-1 bg-brand text-white rounded-xl hover:bg-brand-hov transition">Submit</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="px-6 py-3 flex justify-between mt-6 items-center">
+            <div class="space-x-3">
+                {% if problems.has_previous %}
+                    <button class="px-6 py-3 text-lg font-semibold bg-brand-dark rounded-xl text-white hover:bg-brand-dhov" onclick="pageFirst()">&laquo;</button>
+                    <button class="px-6 py-3 text-lg font-semibold bg-brand-dark rounded-xl text-white hover:bg-brand-dhov" onclick="pageDown()">Previous</button>
+                {% else %}
+                    <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">&laquo;</button>
+                    <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">Previous</button>
+                {% endif %}
+            </div>
+
+            <h3>Page {{problems.number}} - {{problems.paginator.num_pages}}</h3>
+            
+            <div class="space-x-3">
+                {% if problems.has_next %}
+                    <button class="px-6 py-3 text-lg font-semibold bg-brand rounded-xl text-white hover:bg-brand-hov" onclick="pageUp()">Next</button>
+                    <button class="px-6 py-3 text-lg font-semibold bg-brand rounded-xl text-white hover:bg-brand-hov" onclick="pageLast()">&raquo;</button>
+                {% else %}
+                    <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">Next</button>
+                    <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">&raquo;</button>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="p-6 bg-gray-200 rounded-2xl col-span-1">
+        <h2 class="text-2xl font-semibold text-center">Filter</h2>
+
+        <form method="get" action="{% url 'problems' %}">
+            <table class="table-auto w-full border-separate border-spacing-y-1 mt-8">
+                <input type="hidden" name="categories" id="categories_input" />
+                <tr>
+                    <td class="py-4">Search:</td>
+                    <td class="py-4">
+                        <div class="flex justify-between items-center mx-3">
+                            <input type="text" placeholder="Search..." name="query" class="bg-while px-3 py-1 rounded-md"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-4">Rating:</td>
+                    <td class="py-4">
+                        <div class="flex justify-between items-center mx-3">
+                            <input type="number" max="3500" min="0" placeholder="from" name="min-rating" class="bg-while px-3 py-1 rounded-md"/>
+                            <p>-</p>
+                            <input type="number" max="3500" min="0" placeholder="to" name="max-rating" class="bg-while px-3 py-1 rounded-md"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-4">Choose:</td>
+                    <td class="py-4">
+                        <select id="cat_list" class="bg-white mx-3 px-3 py-1 rounded-md">
+                            <option value="" selected disabled hidden>Choose a category</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.slug }}">{{cat.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <div id="cats" class="mx-3 mb-1 flex flex-wrap gap-1"></div>
+
+            <div class="flex justify-center space-x-4 my-4">
+                <input type="submit" value="Filter" class="font-semibold px-6 py-3 bg-brand text-white rounded-xl hover:bg-brand-hov transition"/>
+                <a href="{% url 'problems' %}" class="font-semibold px-6 py-3 bg-brand-dark text-white rounded-xl hover:bg-brand-dhov transition">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    selected = []
+
+    function removeFromSelected(value){
+        selected = selected.filter(cat => cat !== value);
+    }
+    
+    document.getElementById('cat_list').addEventListener('input', function (){
+        const value = this.value;
+        const name = this.options[this.selectedIndex].text;
+
+        if (!selected.includes(value)){
+            const span = document.createElement("span");
+            const btn = document.createElement("button");
+            span.textContent = name;
+            span.className = "text-sm bg-gray-100 px-2 py-1 rounded-md";
+
+            btn.textContent = '✕';
+            btn.className = "ml-1";
+
+            span.id = value;
+            btn.onclick = function () {
+                removeFromSelected(value);
+                span.remove();
+            };
+            span.appendChild(btn)
+
+            selected.push(value);
+            document.getElementById('cats').appendChild(span);
+
+            document.getElementById('categories_input').value = JSON.stringify(selected);
+        }
+    });
+
+</script>
+
+<script>
+    function ratingSort() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        const current = params.get('order');
+
+        let next;
+        if (current === 'RATING_ASC') next = 'RATING_DSC';
+        else if (current === 'RATING_DSC') next = null;
+        else next = 'RATING_ASC';
+
+        if (next === null) {
+            params.delete('order');
+        } else {
+            params.set('order', next);
+        }
+
+        window.location.href = url.toString();
+    }
+
+    function acrSort() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        const current = params.get('order');
+
+        let next;
+        if (current === 'ACR_ASC') next = 'ACR_DSC';
+        else if (current === 'ACR_DSC') next = null;
+        else next = 'ACR_ASC';
+
+        if (next === null) {
+            params.delete('order');
+        } else {
+            params.set('order', next);
+        }
+
+        window.location.href = url.toString();
+    }
+
+    function pageUp() {
+        {% if problems.has_next %}
+            const url = new URL(window.location);
+            const params = url.searchParams;
+            params.set('page', '{{ problems.next_page_number }}');
+            window.location.href = url.toString();
+        {% endif %}
+    }
+
+    function pageDown() {
+        {% if problems.has_previous %}
+            const url = new URL(window.location);
+            const params = url.searchParams;
+            params.set('page', '{{ problems.previous_page_number }}');
+            window.location.href = url.toString();
+        {% endif %}
+    }
+
+    function pageFirst() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        params.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    function pageLast() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        params.set('page', '{{problems.paginator.num_pages}}');
+        window.location.href = url.toString();
+    }
+</script>
+
+{% endblock %}

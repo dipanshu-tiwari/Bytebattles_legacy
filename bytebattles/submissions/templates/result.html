@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}
+submission {{submission.pk}}
+{% endblock %}
+
+{% block content %}
+
+<div class="p-6 m-6 bg-gray-200 rounded-2xl">
+    <div>
+        <h2 class="text-2xl font-semibold mb-2">Submission Details:</h2>
+
+        <table class="border-separate border-spacing-x-6">
+            <tr>
+                <td>Problem:</td>
+                <td><a href="{% url 'details' submission.problem.pid %}">{{submission.problem.name}}</a></td>
+            </tr>
+            <tr>
+                <td>From:</td>
+                <td><a href="{% url 'profile' submission.user.username %}">{{submission.user.username}}</a></td>
+            </tr>
+            <tr>
+                <td>Time:</td>
+                <td>{{submission.time}}</td>
+            </tr>
+            <tr>
+                <td>Language:</td>
+                <td>{{submission.get_language_display}}</td>
+            </tr>
+            <tr>
+                <td>Wall Time:</td>
+                {% if submission.walltime is not None %}
+                <td>{{submission.walltime}} ms</td>
+                {% else %}
+                <td>-</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td>Maximum used Memory:</td>
+                <td>{{submission.memory}} KB</td>
+            </tr>
+            <tr>
+                <td>Verdict:</td>
+                <td>
+                    <div class="flex items-center"><p class="px-4 py-2 bg-{{submission.color}} text-white rounded-xl">{{submission.get_verdict_display}}</p></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="mt-6">
+        <div class="flex space-x-6 mb-2">
+            <h2 class="text-2xl font-semibold mb-2">Code: <a class="text-lg px-2 py-1 bg-brand text-white rounded-lg hover:bg-brand-hov transition" onclick="copyToClipboard('code')" id="code-btn">Copy</a></h3>
+        </div>
+        <pre id="code" class="p-4 bg-white box-border border-2 border-gray-400 rounded-xl">{{submission.code}}</pre>
+    </div>
+
+    {% if submission.verdict != verdict.PD %}
+        <div class="mt-6">
+            <h2 class="text-2xl font-semibold mb-2">Testcases:</h2>
+            {% if submission.incorrect_testcase %}
+                <h3>{{submission.get_verdict_display}} on testcase {{submission.incorrect_testcase}}</h3>
+            {% else %}
+                <h3>All tests passed</h3>
+            {% endif %}
+
+            {% if output %}
+                <div class="my-4 ml-4">
+                    <h3 class="my-2">Recieved Output: <a class="px-2 py-1 bg-brand text-white rounded-lg hover:bg-brand-hov transition" onclick="copyToClipboard('input')" id="input-btn">Copy</a></h3>
+                    <div class="flex">
+                        <pre class="px-4 py-2 bg-white rounded-xl" id="input">{{output}}</pre>
+                    </div>
+
+                    <h3 class="my-2">Expected Output: <a class="px-2 py-1 bg-brand text-white rounded-lg hover:bg-brand-hov transition" onclick="copyToClipboard('output')" id="output-btn">Copy</a></h3>
+                    <div class="flex">
+                        <pre class="px-4 py-2 bg-white rounded-xl" id="output">{{expected}}</pre>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function copyToClipboard(id) {
+    let raw = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(raw).then(function() {
+        document.getElementById(id + "-btn").innerText = "Copied!"
+    }, function(err) {
+        document.getElementById(id + "-btn").innerText = "Failed!"
+    });
+}
+</script>
+
+{% endblock %}

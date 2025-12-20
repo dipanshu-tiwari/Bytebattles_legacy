@@ -1,0 +1,85 @@
+{% extends 'layout_profile.html' %}
+ 
+{% block prof_title %}
+Statistics
+{% endblock %}
+
+{% block prof_content %}
+
+<div class="grid grid-cols-2 gap-x-6">
+    <div>
+        <h2 class="text-3xl font-bold text-center">Problems</h2>
+
+        <div class="p-6 mt-6 flex items-center bg-gray-200 rounded-2xl">
+            <div class="w-[220px] h-[220px] rounded-full flex justify-center items-center" style="
+            background: conic-gradient(
+                {{profile.color}} 0% {{percent_solved}}%,
+                #dddddd 0% 100%
+            );
+            ">
+                <div class="w-[200px] h-[200px] bg-white rounded-full flex justify-center items-center">
+                    <p class="text-3xl font-bold" style="color: {{profile.color}};">{{percent_solved}}<span>%</span></p>
+                </div>
+            </div>
+            
+            <table class="table-auto border-separate border-spacing-x-12">
+                <tr>
+                    <td class="text-lg font-semibold">Solved:</td>
+                    <td class="text-lg font-semibold">{{problem_solved}}</td>
+                </tr>
+                <tr>
+                    <td class="text-lg font-semibold">Attempted:</td>
+                    <td class="text-lg font-semibold">{{total_attempted}}</td>
+                </tr>
+                <tr>
+                    <td class="text-lg font-semibold">Total:</td>
+                    <td class="text-lg font-semibold">{{total_problems}}</td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+    <div>
+        <h2 class="text-3xl font-bold text-center">Submissions</h2>
+
+        <div class="p-6 mt-6 flex items-center bg-gray-200 rounded-2xl">
+            <div class="w-[220px] h-[220px] rounded-full flex justify-center items-center" style="
+            background: conic-gradient(
+                {{profile.color}} 0% {{percent_accepted}}%,
+                #dddddd 0% 100%
+            );
+            ">
+                <div class="w-[200px] h-[200px] bg-white rounded-full flex justify-center items-center">
+                    <p class="text-3xl font-bold" style="color: {{profile.color}};">{{percent_accepted}}<span>%</span></p>
+                </div>
+            </div>
+            
+            <table class="table-auto border-separate border-spacing-x-12">
+                <tr>
+                    <td class="text-lg font-semibold">Accepted:</td>
+                    <td class="text-lg font-semibold">{{accepted_submissions}}</td>
+                </tr>
+                <tr>
+                    <td class="text-lg font-semibold">Wrong Answers:</td>
+                    <td class="text-lg font-semibold">{{wa_submissions}}</td>
+                </tr>
+                <tr>
+                    <td class="text-lg font-semibold">TLEs:</td>
+                    <td class="text-lg font-semibold">{{tle_submissions}}</td>
+                </tr>
+                <tr>
+                    <td class="text-lg font-semibold">MLEs:</td>
+                    <td class="text-lg font-semibold">{{mle_submissions}}</td>
+                </tr>
+                <tr>
+                    <td class="text-lg font-semibold">Total:</td>
+                    <td class="text-lg font-semibold">{{total_submissions}}</td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

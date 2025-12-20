@@ -1,0 +1,95 @@
+{% extends 'layout_profile.html' %}
+ 
+{% block prof_title %}
+Statistics
+{% endblock %}
+
+{% block prof_content %}
+
+<div class="p-6 bg-gray-200 rounded-2xl">
+    <h2 class="text-2xl font-semibold text-center">Submissions</h2>
+
+    <table class="table-auto w-full border-separate border-spacing-y-1 mt-8">
+        <tr>
+            <th class="text-lg">Submission ID</th>
+            <th class="text-lg">Problem</th>
+            <th class="text-lg">Verdict</th>
+            <th class="text-lg">Language</th>
+            <th class="text-lg">Details</th>
+        </tr>
+        <tr>
+            <td class="pt-5"></td>
+        </tr>
+        {% for sub in submissions %}
+        <tr class="odd:bg-white">
+            <td class="text-center py-4 px-3"><a href="{% url 'result' sub.pk %}">{{sub.pk}}</a></td>
+            <td class="text-center py-4 px-3"><a href="{% url 'details' sub.problem.pid %}">{{sub.problem.name}}</a></td>
+            <td class="text-center py-4 px-3 text-{{sub.color}} font-bold">{{sub.get_verdict_display}}</td>
+            <td class="text-center py-4 px-3">{{sub.get_language_display}}</td>
+            <td class="text-center py-4 px-3"><a href="{% url 'result' sub.pk %}" class="font-semibold px-2 py-1 bg-brand-dark text-white rounded-xl hover:bg-brand-dhov transition">Details</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="px-6 py-3 flex justify-between mt-6 items-center">
+        <div class="space-x-3">
+            {% if submissions.has_previous %}
+                <button class="px-6 py-3 text-lg font-semibold bg-brand-dark rounded-xl text-white hover:bg-brand-dhov" onclick="pageFirst()">&laquo;</button>
+                <button class="px-6 py-3 text-lg font-semibold bg-brand-dark rounded-xl text-white hover:bg-brand-dhov" onclick="pageDown()">Previous</button>
+            {% else %}
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">&laquo;</button>
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">Previous</button>
+            {% endif %}
+        </div>
+
+        <h3>Page {{submissions.number}} - {{submissions.paginator.num_pages}}</h3>
+        
+        <div class="space-x-3">
+            {% if submissions.has_next %}
+                <button class="px-6 py-3 text-lg font-semibold bg-brand rounded-xl text-white hover:bg-brand-hov" onclick="pageUp()">Next</button>
+                <button class="px-6 py-3 text-lg font-semibold bg-brand rounded-xl text-white hover:bg-brand-hov" onclick="pageLast()">&raquo;</button>
+            {% else %}
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">Next</button>
+                <button class="px-6 py-3 text-lg font-semibold rounded-xl text-white bg-gray-400">&raquo;</button>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    function pageUp() {
+        {% if submissions.has_next %}
+            const url = new URL(window.location);
+            const params = url.searchParams;
+            params.set('page', '{{ submissions.next_page_number }}');
+            window.location.href = url.toString();
+        {% endif %}
+    }
+
+    function pageDown() {
+        {% if submissions.has_previous %}
+            const url = new URL(window.location);
+            const params = url.searchParams;
+            params.set('page', '{{ submissions.previous_page_number }}');
+            window.location.href = url.toString();
+        {% endif %}
+    }
+
+    function pageFirst() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        params.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    function pageLast() {
+        const url = new URL(window.location);
+        const params = url.searchParams;
+        params.set('page', '{{submissions.paginator.num_pages}}');
+        window.location.href = url.toString();
+    }
+</script>
+
+{% endblock %}

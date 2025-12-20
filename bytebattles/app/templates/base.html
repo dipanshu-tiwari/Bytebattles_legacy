@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                    colors: {
+                        brand: {
+                        light: '#3AAFA9',
+                        DEFAULT: '#2B7A78',
+                        dark: '#17252A',
+                        hov: '#45A19E',
+                        dhov: '#334952',
+                        lhov: '#67E6DF'
+                        },
+                    },
+                    },
+                },
+            }
+        </script>
+
+        <title>{% block title %}{% endblock %} | ByteBattles</title>
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body class="min-h-screen flex flex-col">
+
+        <nav class="px-6 py-3 h-20 flex justify-between items-center border-b border-gray-200">
+            <a href="{% url 'index' %}" class="text-xl font-bold">ByteBattles</a>
+            <div class="space-x-6">
+                <a href="{% url 'problems' %}" class="text-lg font-semibold hover:text-gray-600">Problems</a>
+                <!-- <a href="#" class="text-lg font-semibold hover:text-gray-600">Leaderboard</a> -->
+                <a href="{% url 'submit' %}" class="text-lg font-semibold hover:text-gray-600">Submit</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' user.username %}" class="text-lg font-semibold px-6 py-3 bg-brand-dark text-white rounded-xl hover:bg-brand-dhov transition">Profile</a>
+                    <a href="{% url 'logout' %}" class="text-lg font-semibold px-6 py-3 bg-brand text-white rounded-xl hover:bg-brand-hov transition">Logout</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="text-lg font-semibold px-6 py-3 bg-brand-dark text-white rounded-xl hover:bg-brand-dhov transition">Register</a>
+                    <a href="{% url 'login' %}" class="text-lg font-semibold px-6 py-3 bg-brand text-white rounded-xl hover:bg-brand-hov transition">Login</a>
+                {% endif %}
+            </div>
+        </nav>
+
+        <div class="flex-grow">
+            {% for message in messages %}
+                <h2 class="mt-6 text-red-500 text-lg font-semibold text-center">{{message}}</h2>
+            {% endfor %}
+
+            {% block content %}
+
+            {% endblock %}
+        </div>
+
+        <footer class="px-6 py-6 bg-gray-800">
+            <div class="flex justify-between">
+                <div class="w-2/3 pr-10">
+                    <h3 class="text-lg font-semibold text-gray-400">About</h3>
+
+                    <p class="text-md font-semibold text-gray-500">ByteBattles is a coding practice platform where you can solve problems, improve your skills, and track your progress. With instant feedback and a smooth problem-solving experience, it makes learning to code engaging and fun.</p>
+                </div>
+
+                <div class="w-1/3 pl-10">
+                    <h3 class="mb-6 text-xl font-semibold text-gray-400">Menu</h3>
+                    
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'index' %}" class="text-lg font-semibold text-gray-400 hover:text-teal-500">Home</a></li>
+                        <!-- <li><a href="#" class="text-lg font-semibold text-gray-400 hover:text-teal-500">Terms and Conditions</a></li>
+                        <li><a href="#" class="text-lg font-semibold text-gray-400 hover:text-teal-500">Privacy Policy</a></li>
+                        <li><a href="#" class="text-lg font-semibold text-gray-400 hover:text-teal-500">Report</a></li>
+                        <li><a href="#" class="text-lg font-semibold text-gray-400 hover:text-teal-500">Organize</a></li> -->
+                    </ul>
+                </div>
+            </div>
+
+            <p class="mt-6 text-md font-semibold text-white text-center">ByteBattles (c) Copyright 2025-present Dipanshu Tiwari</p>
+        </footer>
+    </body>
+</html>

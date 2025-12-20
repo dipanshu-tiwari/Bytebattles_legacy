@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}
+New Submission
+{% endblock %}
+
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="p-6 m-6 bg-gray-200 rounded-2xl">
+    <h2 class="text-2xl font-bold text-center my-6">Submit Solutions</h2>
+    <form action="{% url 'submit' %}" method="post" enctype="multipart/form-data" class="mx-12" onsubmit="syncEditor();">
+        {% csrf_token %}
+
+        <table class="border-separate border-spacing-x-8 border-spacing-y-6">
+            <tr>
+                <td class="text-lg font-semibold">Problem ID: </td>
+                <td>
+                    <input type="text" name="problem" value="{{ pid }}" required placeholder="1CSES" class="bg-white px-4 py-2 rounded-xl box-border border-2 border-gray-400"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-lg font-semibold">Language: </td>
+                <td>
+                    <select id="lang" name="language" class="bg-white px-4 py-2 rounded-xl box-border border-2 border-gray-400">
+                        {% for code, label in languages %}
+                            <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-lg font-semibold">Source Code: </td>
+                <td>
+                    <textarea id="real-textarea" name="code" class="hidden"></textarea>
+                    <div id="editor" class="bg-white px-4 py-2 rounded-xl box-border border-2 border-gray-400 h-[512px] w-[640px]"></div>
+                    <div class="flex justify-between mt-1">
+                        <div class="flex items-center space-x-3">
+                            <p>Font Size: </p>
+                            <input id="fontSize" type="number" step="2" min="12" max="24" value="18" class="bg-white px-3 py-1 rounded-xl box-border border-2 border-gray-400"/>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <p>Tab Size: </p>
+                            <input id="tabSize" type="number" step="1" min="2" max="8" value="4" class="bg-white px-3 py-1 rounded-xl box-border border-2 border-gray-400"/>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-lg font-semibold">Or Choose File: </td>
+                <td>
+                    <input type="file" name="file" class="bg-white px-4 py-2 rounded-xl box-border border-2 border-gray-400"/>
+                </td>
+            </tr>
+        </table>
+
+        <div class="flex justify-center my-3">
+            <input type="submit" value="Submit" class="text-lg font-semibold px-6 py-3 bg-brand text-white rounded-xl hover:bg-brand-hov transition"/>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Initialize the Ace Editor
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/textmate");
+    editor.session.setMode("ace/mode/c");
+
+    // Sync content to the hidden textarea before form submit
+    function syncEditor() {
+        var textarea = document.getElementById("real-textarea");
+        textarea.value = editor.getValue();
+    }
+
+    editor.setOptions({
+        fontSize: "18px",
+        tabSize: 4
+    });
+
+    document.getElementById("fontSize").addEventListener("input", function () {
+        let size = this.value
+        editor.setOptions({
+            fontSize: size + "px"
+        });
+    });
+
+    document.getElementById("tabSize").addEventListener("input", function () {
+        let size = this.value
+        editor.setOptions({
+            tabSize: size
+        });
+    });
+
+    const langMap = {
+        'C': 'c',
+        'CPP': 'c_cpp',
+        'PY': 'python',
+        'JS': 'javascript',
+        'JV': 'java'
+    };
+
+    document.getElementById("lang").addEventListener("input", function () {
+        const mode = langMap[this.value];
+
+        if (mode) {
+            editor.session.setMode("ace/mode/text");
+            editor.session.setMode("ace/mode/" + mode);
+        }
+    });
+</script>
+
+{% endblock %}
